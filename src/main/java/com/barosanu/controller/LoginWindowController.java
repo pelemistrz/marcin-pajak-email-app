@@ -47,7 +47,9 @@ public class LoginWindowController extends BaseController implements Initializab
                         switch (emailLoginResult) {
                             case SUCCESS:
                                 System.out.println("login successful" + emailAccount);
-                                viewFactory.showMainWindow();
+                                if (!viewFactory.isMainViewInitialized()) {
+                                    viewFactory.showMainWindow();
+                                }
                                 Stage stage = (Stage) errrorLabel.getScene().getWindow();
                                 viewFactory.closeStage(stage);
                                 return;
@@ -56,8 +58,6 @@ public class LoginWindowController extends BaseController implements Initializab
                                 return;
                             case FAILED_BY_UNEXPECTED_ERROR:
                                 errrorLabel.setText("Unexpected error");
-                                return;
-                            default:
                                 return;
                         }
                     }
@@ -68,11 +68,6 @@ public class LoginWindowController extends BaseController implements Initializab
         }
         System.out.println("Login clicked");
 
-
-//        viewFactory.showMainWindow();
-//
-//        Stage stage = (Stage) errrorLabel.getScene().getWindow();
-//        viewFactory.closeStage(stage);
     }
 
     private boolean fieldsAreValid() {
