@@ -4,12 +4,12 @@ import com.barosanu.model.EmailMessage;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.internet.MimeBodyPart;
 import java.io.IOException;
 
 public class MessageRendererService extends Service {
@@ -48,35 +48,56 @@ public class MessageRendererService extends Service {
         };
     }
     private void loadMessage() throws MessagingException, IOException {
-        stringBuffer.setLength(0);
+        stringBuffer.setLength(0); //clears the SB
         Message message = emailMessage.getMessage();
         String contentType = message.getContentType();
+        System.out.println("To jest "+contentType);
+
+
         if(isSimpleType(contentType)){
             stringBuffer.append(message.getContent().toString());
         } else if(isMultipartType(contentType)){
+
             Multipart multipart = (Multipart) message.getContent();
-            for(int i = multipart.getCount()-1; i >= 0; i--){
-                BodyPart bodyPart = multipart.getBodyPart(i);
-                String bodyPartContentType = bodyPart.getContentType();
-                if(isSimpleType(bodyPartContentType)){
-                    stringBuffer.append(bodyPart.getContent().toString());
-                }
+            loadMultipart(multipart, stringBuffer);
+        }
+    }
+
+    private void loadMultipart(Multipart multipart, StringBuffer stringBuffer) throws MessagingException, IOException {
+        for (int i = multipart.getCount() - 1; i>=0; i--){
+            BodyPart bodyPart = multipart.getBodyPart(i);
+            String contentType = bodyPart.getContentType();
+
+            if(isMultipartType(contentType)){
+                Multipart multipart2 = (Multipart) bodyPart.getContent();
+                loadMultipart(multipart2, stringBuffer);
+            } else  if (isSimpleType(contentType)){
+                stringBuffer.append(bodyPart.getContent().toString());
+            }            else if(!isTextPlain(contentType)){
+                //here we get the attachments:
+                MimeBodyPart mbp = (MimeBodyPart) bodyPart;
+                emailMessage.addAttachment(mbp);
+
             }
         }
     }
-    private boolean isSimpleType(String contentType) {
-        if(contentType.contains("TEXT/HTML")||
-        contentType.contains("mixed")||
-        contentType.contains("text")){
+    private boolean isTextPlain(String contentType){
+        return  contentType.contains("TEXT/PLAIN");
+    }
+
+    private boolean isSimpleType(String contentType){
+        if(contentType.contains("TEXT/HTML") ||
+                contentType.contains("text")){
             return true;
-        }else {
+        } else {
             return false;
         }
     }
-    private boolean isMultipartType(String contentType) {
+
+    private boolean isMultipartType(String contentType){
         if(contentType.contains("multipart")){
             return true;
-        }else {
+        } else {
             return false;
         }
     }
