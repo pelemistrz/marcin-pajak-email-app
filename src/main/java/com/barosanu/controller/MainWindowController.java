@@ -8,10 +8,7 @@ import com.barosanu.model.SizeInteger;
 import com.barosanu.view.ViewFactory;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.web.WebView;
 import javafx.util.Callback;
@@ -21,20 +18,30 @@ import java.util.Date;
 import java.util.ResourceBundle;
 
 public class MainWindowController extends BaseController implements Initializable {
-    public MainWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName) {
-        super(emailManager, viewFactory, fxmlName);
-    }
-
-    private MessageRendererService messageRendererService;
+     private MessageRendererService messageRendererService;
+     private MenuItem markUnredMenu = new MenuItem("mark as unred");
+    private MenuItem deleteMessageMenuItem = new MenuItem("delete message");
 
     @FXML
     private WebView emailWebView;
-
     @FXML
     private TreeView<String> emailsTreeView;
     @FXML
     private TableView<EmailMessage> emailsTableView;
+    @FXML
+    private TableColumn<EmailMessage, Date> dateCol;
+    @FXML
+    private TableColumn<EmailMessage, String> recipientCol;
+    @FXML
+    private TableColumn<EmailMessage, String> senderCol;
+    @FXML
+    private TableColumn<EmailMessage, SizeInteger> sizeCol;
+    @FXML
+    private TableColumn<EmailMessage, String> subjectCol;
 
+    public MainWindowController(EmailManager emailManager, ViewFactory viewFactory, String fxmlName) {
+        super(emailManager, viewFactory, fxmlName);
+    }
     @FXML
     void optionsAction() {
         viewFactory.showOptionsWindow();
@@ -42,24 +49,11 @@ public class MainWindowController extends BaseController implements Initializabl
     @FXML
     void addAccountAction() {
         viewFactory.showLoginWindow();
-
     }
     @FXML
-    private TableColumn<EmailMessage, Date> dateCol;
-
-    @FXML
-    private TableColumn<EmailMessage, String> recipientCol;
-
-    @FXML
-    private TableColumn<EmailMessage, String> senderCol;
-
-    @FXML
-    private TableColumn<EmailMessage, SizeInteger> sizeCol;
-
-    @FXML
-    private TableColumn<EmailMessage, String> subjectCol;
-
-
+    void composeMessageAction() {
+        viewFactory.showComposeMessageWindow();
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -69,12 +63,27 @@ public class MainWindowController extends BaseController implements Initializabl
         setUpBoldRows();
         setUpMessageRendererService();
         setUpMessageSelection();
+        setUpContextMenus();
+    }
+
+    private void setUpContextMenus() {
+        markUnredMenu.setOnAction(e->{
+            emailManager.setUnRead();
+        });
+        deleteMessageMenuItem.setOnAction(e->{
+            emailManager.deleteSelectedMessage();
+            emailWebView.getEngine().loadContent("");
+        });
     }
 
     private void setUpMessageSelection() {
         emailsTableView.setOnMouseClicked(e->{
             EmailMessage emailMessage = emailsTableView.getSelectionModel().getSelectedItem();
             if (emailMessage != null) {
+                emailManager.setSelectedMessage(emailMessage);
+                if(!emailMessage.isRead()){
+                    emailManager.setRead();
+                }
                 messageRendererService.setEmailMessage(emailMessage);
                 messageRendererService.restart();
             }
@@ -110,6 +119,7 @@ public class MainWindowController extends BaseController implements Initializabl
         emailsTreeView.setOnMouseClicked(e->{
             EmailTreeItem<String> item = (EmailTreeItem<String>) emailsTreeView.getSelectionModel().getSelectedItem();
             if(item!=null){
+                emailManager.setSelectedFolder(item);
                 emailsTableView.setItems(item.getEmailMessages());
             }
         });
@@ -122,12 +132,15 @@ public class MainWindowController extends BaseController implements Initializabl
         sizeCol.setCellValueFactory(new PropertyValueFactory<EmailMessage,SizeInteger>("size"));
         dateCol.setCellValueFactory(new PropertyValueFactory<EmailMessage,Date>("date"));
 
+        emailsTableView.setContextMenu(new ContextMenu(markUnredMenu,deleteMessageMenuItem));
+
     }
 
     private void setUpEmailsTreeView() {
         emailsTreeView.setRoot(emailManager.getFoldersRoot());
         emailsTreeView.setShowRoot(false);
     }
+
 }
 
 
