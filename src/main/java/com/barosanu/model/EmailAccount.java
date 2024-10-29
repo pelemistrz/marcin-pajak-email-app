@@ -40,16 +40,15 @@ public class EmailAccount {
         properties.put("mail.store.protocol", "imaps");
         properties.put("mail.imap.port", "993");
 
-
-
-
         properties.put("mail.transport.protocol", "smtps");
         properties.put("mail.smtps.host", "smtp.poczta.onet.pl");
         properties.put("mail.smtps.port", "465");
         properties.put("mail.smtps.auth", "true");
         properties.put("outgoingHost", "smtp.poczta.onet.pl");
+    }
 
-
-
+    @Override
+    public String toString() {
+        return  address ;
     }
 }
