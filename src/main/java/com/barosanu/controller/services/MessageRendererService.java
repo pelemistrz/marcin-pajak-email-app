@@ -51,7 +51,6 @@ public class MessageRendererService extends Service {
         stringBuffer.setLength(0); //clears the SB
         Message message = emailMessage.getMessage();
         String contentType = message.getContentType();
-        System.out.println("To jest "+contentType);
 
 
         if(isSimpleType(contentType)){

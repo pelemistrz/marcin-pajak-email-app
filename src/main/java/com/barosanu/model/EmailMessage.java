@@ -68,6 +68,10 @@ public class EmailMessage {
         return hasAttachments;
     }
 
+    public List<MimeBodyPart> getAttachmentList() {
+        return attachmentList;
+    }
+
     public void setHasAttachments(boolean hasAttachments) {
         this.hasAttachments = hasAttachments;
     }
@@ -75,6 +79,6 @@ public class EmailMessage {
     public void addAttachment(MimeBodyPart mbp) {
         hasAttachments = true;
         attachmentList.add(mbp);
-        System.out.println("Added attachment " + mbp);
+
     }
 }
