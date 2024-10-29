@@ -1,7 +1,7 @@
 package com.barosanu.model;
 
-public class SizeInteger {
-    private int size;
+public class SizeInteger implements Comparable<SizeInteger> {
+    private final int size;
 
     public SizeInteger(int size) {
         this.size = size;
@@ -18,5 +18,17 @@ public class SizeInteger {
             return size/1024/1024+" mB";
         }
         return size/1024/1024/1024+" gB";
+    }
+
+    @Override
+    public int compareTo(SizeInteger o) {
+        if(size>o.size){
+            return 1;
+        }else if(size<o.size){
+            return -1;
+        }else {
+            return 0;
+        }
+
     }
 }
