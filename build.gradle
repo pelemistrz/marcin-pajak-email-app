@@ -23,12 +23,13 @@ test {
     useJUnitPlatform()
 }
 
-javafx{
+javafx {
     version = "23.0.1"
-    modules = ['javafx.controls','javafx.fxml','javafx.web']
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.web']
 }
-
-mainClassName = 'com.barosanu.Launcher'
+application {
+    mainClassName = 'com.barosanu.Launcher'
+}
 
 //jar {
 //    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
