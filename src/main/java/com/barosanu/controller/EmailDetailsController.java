@@ -22,7 +22,7 @@ import java.util.ResourceBundle;
 
 public class EmailDetailsController extends BaseController implements Initializable {
 
-    private String LOCATION_OF_DOWNLOADS = "C:/Users/Wójt/Downloads";
+    private String LOCATION_OF_DOWNLOADS = "C:/";
     @FXML
     private HBox hBoxDownloads;
 

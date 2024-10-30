@@ -52,7 +52,7 @@ public class EmailSenderService extends Service {
                     multipart.addBodyPart(messageBodyPart);
                     mimeMessage.setContent(multipart);
                     //adding attachments
-                    if(attachments.size() > 0){
+                    if(!attachments.isEmpty()){
                         for(File file : attachments){
                             MimeBodyPart attachmentBodyPart = new MimeBodyPart();
                             DataSource source = new FileDataSource(file.getAbsolutePath());
